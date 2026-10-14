@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src blob:">
+<title>Trofeu Espelho</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- ===== Janela principal (home / usb / conectando / wifi) ===== -->
+<div id="card">
+  <header class="bar drag">
+    <div class="brand" id="brand"><span class="logo" data-icon="logo"></span><span>Trofeu Espelho</span></div>
+    <button class="ico nodrag hidden" id="btnHome" title="Início" data-icon="home"></button>
+    <div class="spacer"></div>
+    <button class="ico nodrag" id="btnMenu" title="Menu" data-icon="menu"></button>
+    <button class="ico nodrag" id="btnMin" title="Minimizar" data-icon="min"></button>
+    <button class="ico nodrag" id="btnClose" title="Fechar" data-icon="close"></button>
+    <div class="menu hidden" id="menu">
+      <a data-act="settings">Configurações</a>
+      <a data-act="folder">Abrir pasta de capturas</a>
+      <a data-act="about">Sobre</a>
+    </div>
+  </header>
+  <div class="dots dots-tr"></div><div class="dots dots-bl"></div>
+
+  <section class="view" id="vHome">
+    <h2>Escolha um método</h2>
+    <div class="method usb" id="goUsb">
+      <div class="art" data-icon="usbArt"></div>
+      <div><h3>Conexão de USB</h3><p>Pelo cabo. Mais estável e sem travar</p></div>
+      <span class="tag">Recomendado</span>
+    </div>
+    <div class="method wifi" id="goWifi">
+      <div class="art" data-icon="wifiArt"></div>
+      <div><h3>Conexão de Wi‑Fi</h3><p>iPhone e PC na mesma rede Wi‑Fi</p></div>
+    </div>
+    <div class="trophy" data-icon="trophyArt"></div>
+  </section>
+
+  <section class="view hidden" id="vUsb">
+    <h2>Conecte o telefone ao PC via USB</h2>
+    <div class="illus" data-icon="usbIllus"></div>
+    <p class="hint" id="usbHint">Conecte o cabo e toque em <b>Iniciar espelhamento</b> no app Trofeu Espelho do iPhone.</p>
+    <a class="link" id="usbHelp">Nenhum dispositivo detectado?</a>
+    <div class="warn hidden" id="usbWarn"></div>
+  </section>
+
+  <section class="view hidden" id="vConn">
+    <div class="blocks"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2 id="connTitle">Conectando...</h2>
+    <p class="hint" id="connHint"></p>
+  </section>
+
+  <section class="view hidden" id="vWifi">
+    <div class="tabs"><span class="on">Receber espelhamento</span></div>
+    <div class="box">
+      <div><b>Nome do dispositivo:</b> <span id="pcName"></span></div>
+      <div><b>Estado da rede:</b> Conectado <i class="dot"></i></div>
+    </div>
+    <h4>iPhones encontrados</h4>
+    <div id="wifiList" class="list"><p class="hint">Procurando... Abra o app no iPhone e toque em <b>Iniciar espelhamento</b>.</p></div>
+    <h4>Conectar pelo IP</h4>
+    <div class="row"><input id="ipIn" placeholder="ex: 192.168.0.15"><button class="btn" id="ipGo">Conectar</button></div>
+    <p class="hint small">O IP aparece na tela do app Trofeu Espelho no iPhone.</p>
+  </section>
+</div>
+
+<!-- ===== Espelhamento ===== -->
+<div id="mirror" class="hidden">
+  <div class="pill drag">
+    <button class="nodrag" id="mPause" title="Pausar (Espaço)" data-icon="pause"></button>
+    <button class="nodrag" id="mPin" title="Sempre no topo (Ctrl+T)" data-icon="pin"></button>
+    <button class="nodrag" id="mRot" title="Girar (Ctrl+Shift+R)" data-icon="rotate"></button>
+    <button class="nodrag" id="mMin" title="Minimizar" data-icon="min"></button>
+    <button class="nodrag" id="mClose" title="Desconectar" data-icon="close"></button>
+  </div>
+  <div class="stage">
+    <div class="phone drag" id="phone">
+      <span class="sb s1"></span><span class="sb s2"></span><span class="sb s3"></span><span class="sb s4"></span>
+      <div class="screen nodrag" id="screen">
+        <canvas id="cv"></canvas>
+        <canvas id="ink" class="hidden"></canvas>
+        <div class="wait" id="wait">Aguardando imagem do iPhone...</div>
+        <div class="paused hidden" id="pausedTag">Pausado</div>
+        <div class="settingsHost" id="mSetHost"></div>
+      </div>
+    </div>
+    <div class="tools">
+      <div class="avatar" data-icon="logo"></div>
+      <button id="tFull" title="Tela cheia (F11)" data-icon="full"></button>
+      <button id="tShot" title="Captura de tela (Ctrl+S)" data-icon="camera"></button>
+      <button id="tRec" title="Gravar tela (Ctrl+R)" data-icon="rec"></button>
+      <span class="recTime hidden" id="recTime">00:00</span>
+      <button id="tInk" title="Desenhar (Ctrl+D) — duplo clique limpa" data-icon="pen"></button>
+      <button id="tFolder" title="Abrir pasta de capturas" data-icon="folder"></button>
+      <button id="tSet" title="Configurações" data-icon="gear"></button>
+      <button id="tHelp" title="Ajuda" data-icon="help"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Configurações (movido entre a janela e a tela do celular) ===== -->
+<div id="settings" class="hidden">
+  <div class="sHead"><button class="ico" id="sBack" data-icon="back"></button><span id="sTitle">Configurações</span></div>
+  <div class="sBody" id="sBody"></div>
+</div>
+
+<div id="toast" class="hidden"></div>
+<div id="modal" class="hidden"><div class="mbox"><div id="mText"></div><button class="btn" id="mOk">Entendi</button></div></div>
+
+<script src="icons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
