@@ -2,6 +2,8 @@ name: Gerar app do iPhone (IPA)
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: macos-15
@@ -25,3 +27,9 @@ jobs:
         with:
           name: TrofeuEspelho-iPhone
           path: TrofeuEspelho.ipa
+      - name: Publicar IPA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete app-iphone -y --cleanup-tag || true
+          gh release create app-iphone TrofeuEspelho.ipa --title "Trofeu Espelho - app do iPhone" --notes "Build ${{ github.run_number }}"
